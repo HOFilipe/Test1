@@ -1,111 +1,76 @@
 import React from 'react';
-import { Pressable, Text, StyleSheet, ActivityIndicator, View } from 'react-native';
-import { color, space, radius, fontSize } from './tokens';
-
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
-export type ButtonSize = 'small' | 'medium' | 'large';
+import { Pressable, Text, StyleSheet, View } from 'react-native';
+import { Gradient } from './Gradient';
+import { color, spacing, radius, textSmMedium, controlHeight } from './tokens';
 
 export interface ButtonProps {
-  /** Text shown inside the button. */
-  label: string;
-  /** Visual style. Maps 1:1 to the variants in the Figma component. */
-  variant?: ButtonVariant;
-  /** Height and padding preset. */
-  size?: ButtonSize;
-  /** Greys the button out and blocks presses. */
+  /** Button text. Hidden entirely when `showLabel` is false (icon-only button). */
+  label?: string;
+  /** Matches the `label` boolean property on the Figma component. */
+  showLabel?: boolean;
+  /** Matches `iconLeft` in Figma. Pass any 20x20 node. */
+  iconLeft?: React.ReactNode;
+  /** Matches `iconRight` in Figma. Pass any 20x20 node. */
+  iconRight?: React.ReactNode;
+
+  // --- Behaviour. Not expressible in Figma, but required in code. ---
   disabled?: boolean;
-  /** Swaps the label for a spinner. */
-  loading?: boolean;
-  /** Stretches the button to fill its container. */
-  fullWidth?: boolean;
   onPress?: () => void;
 }
 
+/**
+ * Primary button — large.
+ *
+ * Spec source: HOF Design System → "Primary button - lg", node 2257:551.
+ * Height 48, radius 16, 16px horizontal padding, 8px gap, vertical gradient
+ * from Gradients/Blue/100 to Gradients/Blue/200, label in text-sm/medium.
+ */
 export const Button = ({
-  label,
-  variant = 'primary',
-  size = 'medium',
+  label = 'Button',
+  showLabel = true,
+  iconLeft,
+  iconRight,
   disabled = false,
-  loading = false,
-  fullWidth = false,
   onPress,
-}: ButtonProps) => {
-  const isInactive = disabled || loading;
-
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ disabled: isInactive, busy: loading }}
-      disabled={isInactive}
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.base,
-        sizeStyles[size],
-        variantStyles[variant],
-        fullWidth && styles.fullWidth,
-        pressed && !isInactive && pressedStyles[variant],
-        isInactive && styles.inactive,
-      ]}
-    >
-      {loading ? (
-        <ActivityIndicator
-          size="small"
-          color={variant === 'primary' || variant === 'danger' ? color.textInverse : color.brand}
-        />
-      ) : (
-        <View style={styles.labelWrap}>
-          <Text style={[styles.label, labelSizeStyles[size], labelVariantStyles[variant]]}>
-            {label}
-          </Text>
-        </View>
-      )}
-    </Pressable>
-  );
-};
+}: ButtonProps) => (
+  <Pressable
+    accessibilityRole="button"
+    accessibilityLabel={showLabel ? label : undefined}
+    accessibilityState={{ disabled }}
+    disabled={disabled}
+    onPress={onPress}
+    style={({ pressed }) => [pressed && !disabled && styles.pressed, disabled && styles.disabled]}
+  >
+    <Gradient from={color.blue100} to={color.blue200} style={styles.surface}>
+      {iconLeft ? <View style={styles.icon}>{iconLeft}</View> : null}
+      {showLabel ? <Text style={styles.label}>{label}</Text> : null}
+      {iconRight ? <View style={styles.icon}>{iconRight}</View> : null}
+    </Gradient>
+  </Pressable>
+);
 
 const styles = StyleSheet.create({
-  base: {
+  surface: {
+    height: controlHeight.lg,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: 'transparent',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.none,
+    borderRadius: radius.lg,
+    alignSelf: 'flex-start',
   },
-  fullWidth: { alignSelf: 'stretch' },
-  inactive: { opacity: 0.45 },
-  labelWrap: { flexDirection: 'row', alignItems: 'center' },
-  label: { fontWeight: '600' },
-});
-
-const sizeStyles = StyleSheet.create({
-  small: { paddingVertical: space.xs + 2, paddingHorizontal: space.md, minHeight: 32 },
-  medium: { paddingVertical: space.sm + 2, paddingHorizontal: space.lg, minHeight: 40 },
-  large: { paddingVertical: space.md + 2, paddingHorizontal: space.xl, minHeight: 52 },
-});
-
-const labelSizeStyles = StyleSheet.create({
-  small: { fontSize: fontSize.sm },
-  medium: { fontSize: fontSize.md },
-  large: { fontSize: fontSize.lg },
-});
-
-const variantStyles = StyleSheet.create({
-  primary: { backgroundColor: color.brand },
-  secondary: { backgroundColor: color.surface, borderColor: color.border },
-  ghost: { backgroundColor: 'transparent' },
-  danger: { backgroundColor: color.danger },
-});
-
-const pressedStyles = StyleSheet.create({
-  primary: { backgroundColor: color.brandPressed },
-  secondary: { backgroundColor: color.surfaceMuted },
-  ghost: { backgroundColor: color.surfaceMuted },
-  danger: { backgroundColor: '#B93A3A' },
-});
-
-const labelVariantStyles = StyleSheet.create({
-  primary: { color: color.textInverse },
-  secondary: { color: color.textPrimary },
-  ghost: { color: color.brand },
-  danger: { color: color.textInverse },
+  label: {
+    ...textSmMedium,
+    color: color.textPrimary,
+  },
+  icon: {
+    width: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pressed: { opacity: 0.85 },
+  disabled: { opacity: 0.4 },
 });

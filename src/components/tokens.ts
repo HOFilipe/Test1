@@ -1,45 +1,41 @@
 /**
- * Design tokens.
+ * Design tokens — taken from the HOF Design System Figma variables.
  *
- * This is where Figma variables map into code. When you set up the real thing,
- * these values should come from your Figma variables export rather than being
- * typed by hand — but for the test, hand-written is fine.
+ * These names mirror the Figma variable names exactly, so a change in Figma
+ * has an obvious single place to land in code. In a production setup these
+ * would be generated from a Figma variables export rather than typed by hand.
  */
 
 export const color = {
-  brand: '#2F6BFF',
-  brandPressed: '#1F4FCC',
-  danger: '#D64545',
-  success: '#2E9E6B',
-  warning: '#D9922B',
+  // Colors/Text
+  textPrimary: '#ffffff',
 
-  textPrimary: '#14181F',
-  textSecondary: '#5B6472',
-  textInverse: '#FFFFFF',
-
-  surface: '#FFFFFF',
-  surfaceMuted: '#F4F6F9',
-  border: '#DDE2EA',
+  // Gradients/Blue
+  blue100: '#3f83f8',
+  blue200: '#0070ff',
 } as const;
 
-export const space = {
-  xs: 4,
+export const spacing = {
+  // Spacing/*
+  none: 0,
   sm: 8,
-  md: 12,
   lg: 16,
-  xl: 24,
 } as const;
 
 export const radius = {
-  sm: 6,
-  md: 10,
+  // Radius/*
   lg: 16,
-  pill: 999,
 } as const;
 
-export const fontSize = {
-  sm: 13,
-  md: 15,
-  lg: 18,
-  xl: 22,
+/** text-sm/medium — SF Pro, Medium, 14 / 1.5 */
+export const textSmMedium = {
+  fontSize: 14,
+  lineHeight: 21, // 14 * 1.5
+  fontWeight: '500' as const,
+  letterSpacing: 0,
+};
+
+/** Fixed height of the large button. */
+export const controlHeight = {
+  lg: 48,
 } as const;
